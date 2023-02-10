@@ -80,20 +80,29 @@ class MainActivity : AppCompatActivity() {
                 if (!(currentText.last() == '+' || currentText.last() == '-' || currentText.last() == '/' || currentText.last() == '*')) {
                     val numbersAndActions = currentText.split(" ")
                     onActionButtonClick("=")
-                    var calculationResult = numbersAndActions[0].toDouble()
+                    var calculationResult: Double? = numbersAndActions[0].toDouble()
                     numbersAndActions.forEachIndexed { index, numberOrAction ->
                         when (numberOrAction) {
                             "+" -> {
-                                calculationResult += numbersAndActions[index + 1].toDouble()
+                                calculationResult =
+                                    calculationResult?.plus(numbersAndActions[index + 1].toDouble())
                             }
                             "-" -> {
-                                calculationResult -= numbersAndActions[index + 1].toDouble()
+                                calculationResult =
+                                    calculationResult?.minus(numbersAndActions[index + 1].toDouble())
                             }
                             "*" -> {
-                                calculationResult *= numbersAndActions[index + 1].toDouble()
+                                calculationResult =
+                                    calculationResult?.times(numbersAndActions[index + 1].toDouble())
                             }
                             "/" -> {
-                                calculationResult /= numbersAndActions[index + 1].toDouble()
+                                if (numbersAndActions[index + 1] != "0")
+                                    calculationResult =
+                                        calculationResult?.div(numbersAndActions[index + 1].toDouble())
+                                else {
+                                    calculationResult = null
+                                    return@forEachIndexed
+                                }
                             }
                             else -> {
 
@@ -102,7 +111,10 @@ class MainActivity : AppCompatActivity() {
                     }
                     currentText = binding?.tvCalculation?.text
                     binding?.tvCalculation?.text = ""
-                    addCalculationResultToRecyclerView("$currentText $calculationResult")
+                    if (calculationResult == null)
+                        addCalculationResultToRecyclerView("$currentText NaN")
+                    else
+                        addCalculationResultToRecyclerView("$currentText $calculationResult")
                 }
             }
         }
